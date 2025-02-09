@@ -52,7 +52,7 @@ const store= MongoStore.create({
     touchAfter:24*3600,
 })
 
-store.on("err",()=>{
+store.on("err",(err)=>{
     console.log("ERROR in MONGO SESSION STORE",err)
 })
 
@@ -82,6 +82,7 @@ passport.deserializeUser(User.deserializeUser());
 
 
 app.use((req,res,next)=>{
+    console.log("Current User:", req.user); 
     res.locals.success=req.flash("success");
     res.locals.error=req.flash("error");
     res.locals.currUser=req.user;
