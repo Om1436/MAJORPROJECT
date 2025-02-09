@@ -35,7 +35,9 @@
           <a class="nav-link" href="/listing/new">List your place</a>
 
           
-          <% if (!currUser){ %>
+          <% if (!currUser || Object.keys(currUser).length === 0) { %>
+
+            
             <a class="nav-link active" href="/signup"><b>Sign Up</b></a>
             <a class="nav-link" href="/login"><b>Login</b></a>
             <% } %>
