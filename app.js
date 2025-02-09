@@ -57,29 +57,25 @@ store.on("error", (err) => {
 });
 
 
-const sessionOptions={
+const sessionOptions = {
     store,
-    secret:process.env.secret,
-    resave:false,
-    saveUninitialized:true,
-    cookie:{
-            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),  // Expire 7 days from now
-            maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days in milliseconds
-            httpOnly: true
-        }
-}
+    secret: process.env.secret,
+    resave: false,
+    saveUninitialized: true,
+    proxy: true,  // Fix for Render (HTTPS)
+    cookie: {
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Ensures secure cookies in production
+    }
+};
 
 app.use(session(sessionOptions));
 app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use((req, res, next) => {
-    res.locals.success = req.flash("success") || [];  // Ensures success is always an array
-    res.locals.error = req.flash("error") || [];      // Ensures error is always an array
-    res.locals.currUser = req.user || null;          // Ensures currUser is always defined
-    next();
-});
 
 // use static authenticate method of model in LocalStrategy
 passport.use(new LocalStrategy(User.authenticate()))
@@ -115,6 +111,12 @@ app.get("/demo",async(req,res)=>{
     res.send(demoUser)
 });
 
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success") || [];  // Ensures success is always an array
+    res.locals.error = req.flash("error") || [];      // Ensures error is always an array
+    res.locals.currUser = req.user || null;          // Ensures currUser is always defined
+    next();
+});
 
 //Routers
 app.use("/listing",listingRouter)
