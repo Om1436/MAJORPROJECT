@@ -87,15 +87,21 @@ passport.deserializeUser(User.deserializeUser());
 //     res.locals.currUser=req.user;
 //     next();
 // })
+// app.use((req, res, next) => {
+//     res.locals.success = req.flash("success");
+//     res.locals.error = req.flash("error");
+//     res.locals.currUser = req.user || null;
+    
+    
+//     next();
+// });
 app.use((req, res, next) => {
-    res.locals.success = req.flash("success");
-    res.locals.error = req.flash("error");
-    res.locals.currUser = req.user || null;
-    
-    console.log("Current User:", res.locals.currUser); // Debugging line
-    
+    res.locals.success = req.flash("success") || [];  // Ensures success is always an array
+    res.locals.error = req.flash("error") || [];      // Ensures error is always an array
+    res.locals.currUser = req.user || null;          // Ensures currUser is always defined
     next();
 });
+
 
 app.get("/demo",async(req,res)=>{
     let fakeUser=({
