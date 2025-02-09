@@ -52,9 +52,10 @@ const store= MongoStore.create({
     touchAfter:24*3600,
 })
 
-store.on("err",(err)=>{
-    console.log("ERROR in MONGO SESSION STORE",err)
-})
+store.on("error", (err) => {
+    console.log("ERROR in MONGO SESSION STORE:", err);
+});
+
 
 const sessionOptions={
     store,
@@ -73,6 +74,13 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success") || [];  // Ensures success is always an array
+    res.locals.error = req.flash("error") || [];      // Ensures error is always an array
+    res.locals.currUser = req.user || null;          // Ensures currUser is always defined
+    next();
+});
+
 // use static authenticate method of model in LocalStrategy
 passport.use(new LocalStrategy(User.authenticate()))
 
@@ -95,12 +103,7 @@ passport.deserializeUser(User.deserializeUser());
     
 //     next();
 // });
-app.use((req, res, next) => {
-    res.locals.success = req.flash("success") || [];  // Ensures success is always an array
-    res.locals.error = req.flash("error") || [];      // Ensures error is always an array
-    res.locals.currUser = req.user || null;          // Ensures currUser is always defined
-    next();
-});
+
 
 
 app.get("/demo",async(req,res)=>{
